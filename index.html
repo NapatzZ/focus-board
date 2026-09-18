@@ -1,0 +1,601 @@
+<title>บอร์ดโฟกัส</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  --ground:#E8ECF0; --surface:#FFFFFF; --surface-2:#F3F5F8; --ink:#141C24; --ink-2:#56626F; --ink-3:#8793A0;
+  --line:#D2D9E0; --accent:#2944C9; --accent-ink:#FFFFFF;
+  --q-need:#C4342B; --q-important:#2944C9; --q-urgent:#B86E00; --q-later:#3F7A52;
+  --over:#CF2A2A; --warn:#B86E00; --ok:#2E8549;
+  --shadow:0 1px 2px rgba(20,28,36,.06),0 4px 14px rgba(20,28,36,.06);
+  --lift:0 10px 30px rgba(20,28,36,.16);
+  --display:"Bai Jamjuree","IBM Plex Sans Thai",system-ui,sans-serif;
+  --body:"IBM Plex Sans Thai",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --ground:#0E1318; --surface:#161D25; --surface-2:#1C252F; --ink:#E5EBF1; --ink-2:#98A5B2; --ink-3:#66727F;
+    --line:#29343F; --accent:#7D93FF; --accent-ink:#0E1318;
+    --q-need:#FF6E61; --q-important:#7D93FF; --q-urgent:#F0A63A; --q-later:#7EBA8E;
+    --over:#FF5C54; --warn:#F0A63A; --ok:#63C585;
+    --shadow:0 1px 2px rgba(0,0,0,.3); --lift:0 12px 34px rgba(0,0,0,.5);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0E1318; --surface:#161D25; --surface-2:#1C252F; --ink:#E5EBF1; --ink-2:#98A5B2; --ink-3:#66727F;
+  --line:#29343F; --accent:#7D93FF; --accent-ink:#0E1318;
+  --q-need:#FF6E61; --q-important:#7D93FF; --q-urgent:#F0A63A; --q-later:#7EBA8E;
+  --over:#FF5C54; --warn:#F0A63A; --ok:#63C585;
+  --shadow:0 1px 2px rgba(0,0,0,.3); --lift:0 12px 34px rgba(0,0,0,.5);
+}
+*{box-sizing:border-box}
+body{background:var(--ground);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5}
+.wrap{max-width:1320px;margin:0 auto;padding:20px 20px 48px}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* header */
+.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 24px;margin-bottom:18px}
+.top h1{font-family:var(--display);font-weight:700;font-size:1.75rem;line-height:1.1;margin:0;letter-spacing:-.01em}
+.top p{margin:4px 0 0;color:var(--ink-2);font-size:.9rem}
+.stats{display:flex;gap:20px;flex-wrap:wrap}
+.stat{display:flex;flex-direction:column}
+.stat b{font-family:var(--mono);font-weight:600;font-size:1.15rem;font-variant-numeric:tabular-nums}
+.stat span{font-size:.72rem;color:var(--ink-2);letter-spacing:.04em}
+.sync{font-size:.72rem;color:var(--ink-3)}
+
+/* layout */
+.app{display:grid;grid-template-columns:minmax(0,1fr) 390px;gap:20px;align-items:start}
+@media (max-width:940px){.app{grid-template-columns:1fr}.focus{order:-1}}
+
+/* matrix */
+.matrix{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:620px){.matrix{grid-template-columns:1fr}}
+.quad{--q:var(--ink-2);background:color-mix(in srgb,var(--q) 6%,var(--surface));border:1px solid color-mix(in srgb,var(--q) 22%,var(--line));border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:10px;min-height:250px;transition:background .15s,border-color .15s}
+.quad[data-q="need"]{--q:var(--q-need)} .quad[data-q="important"]{--q:var(--q-important)}
+.quad[data-q="urgent"]{--q:var(--q-urgent)} .quad[data-q="later"]{--q:var(--q-later)}
+.quad.drop-hot{background:color-mix(in srgb,var(--q) 16%,var(--surface));border-color:var(--q)}
+.qhead{display:flex;align-items:center;gap:10px}
+.qdot{width:10px;height:10px;border-radius:3px;background:var(--q);flex:none}
+.qhead h2{font-family:var(--display);font-weight:700;font-size:1.15rem;margin:0;color:var(--q)}
+.qhead small{color:var(--ink-2);font-size:.78rem}
+.qcount{margin-left:auto;font-family:var(--mono);font-size:.78rem;color:var(--ink-2)}
+.qadd{border:1px dashed color-mix(in srgb,var(--q) 45%,var(--line));background:transparent;border-radius:10px;padding:8px;color:var(--q);font-weight:500;font-size:.88rem}
+.qadd:hover{background:color-mix(in srgb,var(--q) 10%,transparent)}
+.list{display:flex;flex-direction:column;gap:8px;flex:1}
+.empty{color:var(--ink-3);font-size:.85rem;padding:6px 2px}
+
+/* cards */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:8px;cursor:grab;position:relative}
+.card:active{cursor:grabbing}
+.card.dragging{opacity:.4}
+.card .t{font-weight:500;line-height:1.35;overflow-wrap:anywhere}
+.card .n{font-size:.8rem;color:var(--ink-2);margin-top:-4px;overflow-wrap:anywhere}
+.meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:.78rem;color:var(--ink-2)}
+.chip{font-family:var(--mono);font-variant-numeric:tabular-nums;background:var(--surface-2);border:1px solid var(--line);border-radius:6px;padding:1px 6px}
+.chip.over{color:var(--over);border-color:color-mix(in srgb,var(--over) 40%,var(--line))}
+.meta .go{margin-left:auto;border:0;background:var(--ink);color:var(--surface);border-radius:7px;padding:4px 10px;font-size:.78rem;font-weight:500}
+.meta .go:hover{background:var(--accent);color:var(--accent-ink)}
+.minibar{height:3px;background:var(--surface-2);border-radius:2px;overflow:hidden}
+.minibar i{display:block;height:100%;background:var(--q)}
+.minibar.over i{background:var(--over)}
+
+/* focus panel */
+.focus{position:sticky;top:calc(env(safe-area-inset-top,0px) + 12px);display:flex;flex-direction:column;gap:12px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;box-shadow:var(--shadow)}
+.panel h2{font-family:var(--display);font-weight:700;font-size:1.1rem;margin:0}
+.phead{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:10px}
+.phead small{color:var(--ink-2);font-size:.78rem}
+.dropzone{border:1.5px dashed var(--line);border-radius:12px;min-height:120px;display:flex;flex-direction:column;gap:10px;padding:10px;transition:border-color .15s,background .15s}
+.dropzone.drop-hot{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 7%,transparent)}
+.dz-empty{margin:auto;text-align:center;color:var(--ink-3);font-size:.88rem;padding:14px}
+
+.job{--q:var(--ink-2);border:1px solid var(--line);border-left:4px solid var(--q);border-radius:10px;padding:12px;background:var(--surface-2);display:flex;flex-direction:column;gap:8px;cursor:grab}
+.job[data-q="need"]{--q:var(--q-need)} .job[data-q="important"]{--q:var(--q-important)}
+.job[data-q="urgent"]{--q:var(--q-urgent)} .job[data-q="later"]{--q:var(--q-later)}
+.job .top1{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.job .t{font-weight:600;overflow-wrap:anywhere}
+.tag{font-size:.7rem;color:var(--q);border:1px solid color-mix(in srgb,var(--q) 40%,transparent);border-radius:99px;padding:0 8px;white-space:nowrap}
+.clock{font-family:var(--mono);font-weight:500;font-size:2.4rem;line-height:1;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.job.paused .clock{color:var(--ink-2)}
+.job.over .clock{color:var(--over)}
+.job.running.over .clock{animation:throb 1.2s ease-in-out infinite}
+@keyframes throb{50%{opacity:.55}}
+.state{font-size:.82rem;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.state b{font-family:var(--mono);font-weight:600}
+.job.warn .state b{color:var(--warn)} .job.over .state b{color:var(--over)}
+.bar{position:relative;height:8px;border-radius:4px;background:var(--line);overflow:hidden}
+.bar i{position:absolute;inset:0 auto 0 0;background:var(--ok);border-radius:4px;transition:width .5s linear}
+.job.warn .bar i{background:var(--warn)} .job.over .bar i{background:var(--over)}
+.bar .mark{position:absolute;top:-2px;bottom:-2px;width:2px;background:var(--ink)}
+.acts{display:flex;gap:6px;flex-wrap:wrap}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:6px 12px;font-size:.85rem;font-weight:500}
+.btn:hover{border-color:var(--ink-3)}
+.btn.primary{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.btn.primary:hover{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.good{background:var(--ok);border-color:var(--ok);color:#fff}
+.btn.quiet{border-color:transparent;background:transparent;color:var(--ink-2)}
+.btn.danger{color:var(--over)}
+
+/* done */
+.done-list{display:flex;flex-direction:column;max-height:340px;overflow:auto}
+.drow{display:grid;grid-template-columns:1fr auto;gap:2px 10px;padding:8px 2px;border-top:1px solid var(--line);font-size:.85rem}
+.drow:first-child{border-top:0}
+.drow .t{overflow-wrap:anywhere;text-decoration:line-through;text-decoration-color:var(--ink-3);color:var(--ink-2)}
+.drow .r{font-family:var(--mono);font-size:.78rem;font-variant-numeric:tabular-nums;color:var(--ink-2);text-align:right}
+.drow .d{font-family:var(--mono);font-size:.75rem;text-align:right;grid-column:2}
+.d.over{color:var(--over)} .d.ok{color:var(--ok)}
+.drow .undo{grid-column:1;grid-row:2;justify-self:start;border:0;background:none;padding:0;color:var(--ink-3);font-size:.75rem}
+.drow .undo:hover{color:var(--accent)}
+.done-foot{display:flex;justify-content:space-between;align-items:center;margin-top:8px;font-size:.78rem;color:var(--ink-2)}
+
+/* dialog */
+dialog{border:1px solid var(--line);border-radius:14px;padding:0;background:var(--surface);color:var(--ink);box-shadow:var(--lift);width:min(440px,calc(100vw - 32px))}
+dialog::backdrop{background:rgba(10,15,20,.45)}
+.dlg{padding:18px;display:flex;flex-direction:column;gap:12px}
+.dlg h3{font-family:var(--display);font-size:1.2rem;margin:0}
+label{display:flex;flex-direction:column;gap:4px;font-size:.8rem;color:var(--ink-2);font-weight:500}
+input,textarea,select{font:inherit;font-size:.95rem;color:var(--ink);background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:8px 10px;width:100%}
+textarea{resize:vertical;min-height:60px}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.row>*{flex:1 1 140px}
+.qpick{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.qpick label{flex-direction:row;align-items:center;gap:8px;border:1px solid var(--line);border-radius:8px;padding:7px 10px;color:var(--ink);font-size:.88rem;cursor:pointer}
+.qpick input{width:auto;accent-color:var(--accent)}
+.qpick label:has(input:checked){border-color:var(--accent);background:color-mix(in srgb,var(--accent) 8%,transparent)}
+.quick{display:flex;gap:6px;flex-wrap:wrap}
+.quick button{border:1px solid var(--line);background:var(--surface-2);border-radius:99px;padding:2px 10px;font-size:.78rem;font-family:var(--mono)}
+.dlg-acts{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;margin-top:4px}
+.dlg-acts .btn.danger{margin-right:auto}
+
+.toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 20px);transform:translateX(-50%);background:var(--ink);color:var(--surface);padding:10px 16px;border-radius:10px;box-shadow:var(--lift);font-size:.9rem;max-width:calc(100vw - 32px);z-index:10}
+.toast.alert{background:var(--over);color:#fff}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1>บอร์ดโฟกัส</h1>
+      <p>ลากการ์ดไปช่อง “กำลังทำ” เพื่อเริ่มจับเวลา แล้วดูว่าใช้เวลาเกินที่ตั้งไว้หรือยัง</p>
+    </div>
+    <div class="stats" id="stats"></div>
+  </header>
+
+  <div class="app">
+    <section class="matrix" id="matrix" aria-label="บอร์ดงาน 4 ช่อง"></section>
+
+    <aside class="focus">
+      <div class="panel">
+        <div class="phead"><h2>กำลังทำ</h2><small id="doing-sub">ลากการ์ดมาวางตรงนี้</small></div>
+        <div class="dropzone" id="doing" data-drop="doing"></div>
+      </div>
+      <div class="panel">
+        <div class="phead"><h2>เสร็จแล้ว</h2><small id="done-sub"></small></div>
+        <div class="dropzone" id="done" data-drop="done" style="min-height:60px;border-style:solid;border-color:transparent;padding:0"></div>
+        <div class="done-foot" id="done-foot"></div>
+      </div>
+      <div class="sync" id="sync"></div>
+    </aside>
+  </div>
+</div>
+
+<dialog id="dlg">
+  <form class="dlg" id="form" method="dialog">
+    <h3 id="dlg-title">เพิ่มงาน</h3>
+    <label for="f-title">ชื่องาน
+      <input id="f-title" name="title" required maxlength="140" autocomplete="off" placeholder="เช่น สรุปรายงานประชุม">
+    </label>
+    <label for="f-note">รายละเอียด (ไม่บังคับ)
+      <textarea id="f-note" name="note" maxlength="600"></textarea>
+    </label>
+    <div>
+      <label style="margin-bottom:4px">ช่อง</label>
+      <div class="qpick" id="f-quad"></div>
+    </div>
+    <label for="f-est">เวลาที่ตั้งไว้ (นาที)
+      <input id="f-est" name="est" type="number" min="1" max="1440" step="1" required inputmode="numeric">
+    </label>
+    <div class="quick" id="quick"></div>
+    <div class="dlg-acts">
+      <button type="button" class="btn danger" id="f-del">ลบงาน</button>
+      <button type="button" class="btn quiet" id="f-cancel">ยกเลิก</button>
+      <button type="submit" class="btn primary" id="f-save">บันทึก</button>
+    </div>
+  </form>
+</dialog>
+
+<div class="toast" id="toast" hidden></div>
+
+<script>
+const QUADS = [
+  {id:'need', name:'จำเป็น', hint:'ต้องทำ ห้ามพลาด'},
+  {id:'important', name:'สำคัญ', hint:'ส่งผลระยะยาว'},
+  {id:'urgent', name:'เร่งด่วน', hint:'เส้นตายใกล้'},
+  {id:'later', name:'ไม่เร่งด่วน', hint:'ทำเมื่อว่าง'},
+];
+const QNAME = Object.fromEntries(QUADS.map(q => [q.id, q.name]));
+const LS_KEY = 'focus-board-tasks-v1';
+
+let tasks = new Map();
+let mode = 'loading';
+let col = null;
+const writeChains = new Map();
+const overNotified = new Set();
+
+/* ---------- time helpers ---------- */
+const now = () => Date.now();
+const spent = t => (t.spentMs || 0) + (t.runningSince ? now() - t.runningSince : 0);
+const estMs = t => (t.estMin || 0) * 60000;
+function fmt(ms){
+  ms = Math.max(0, Math.floor(ms / 1000));
+  const h = Math.floor(ms / 3600), m = Math.floor(ms % 3600 / 60), s = ms % 60;
+  const p = n => String(n).padStart(2, '0');
+  return h ? `${h}:${p(m)}:${p(s)}` : `${p(m)}:${p(s)}`;
+}
+function fmtMin(min){
+  if (min < 60) return `${min} นาที`;
+  const h = Math.floor(min / 60), m = min % 60;
+  return m ? `${h} ชม. ${m} นาที` : `${h} ชม.`;
+}
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+/* ---------- storage ---------- */
+function clean(t){ const {id, ...rest} = t; return rest; }
+function persistLocal(){
+  try { localStorage.setItem(LS_KEY, JSON.stringify([...tasks.values()])); } catch {}
+}
+/* one write at a time per task, in order */
+function queue(id, fn, failMsg){
+  const prev = writeChains.get(id) || Promise.resolve();
+  writeChains.set(id, prev.then(fn).catch(e => {
+    toast(e?.code === 'invalid_argument' ? 'คุณมีสิทธิ์ดูอย่างเดียว บันทึกการแก้ไขไม่ได้' : failMsg, true);
+  }));
+}
+async function api(method, id, body){
+  const r = await fetch('api/tasks/' + encodeURIComponent(id), {
+    method, headers:{'Content-Type':'application/json'}, body: body ? JSON.stringify(body) : undefined,
+  });
+  if (!r.ok) throw new Error(r.status);
+}
+function save(t){
+  tasks.set(t.id, t);
+  render();
+  if (mode === 'shared') queue(t.id, () => col.doc(t.id).set(clean(tasks.get(t.id) || t)), 'บันทึกไม่สำเร็จ ลองอีกครั้ง');
+  else if (mode === 'file') queue(t.id, () => api('PUT', t.id, clean(tasks.get(t.id) || t)), 'บันทึกลงไฟล์ไม่สำเร็จ — เซิร์ฟเวอร์ยังเปิดอยู่ไหม?');
+  else persistLocal();
+}
+function remove(id){
+  tasks.delete(id);
+  render();
+  if (mode === 'shared') queue(id, () => col.doc(id).delete(), 'ลบไม่สำเร็จ ลองอีกครั้ง');
+  else if (mode === 'file') queue(id, () => api('DELETE', id), 'ลบไม่สำเร็จ — เซิร์ฟเวอร์ยังเปิดอยู่ไหม?');
+  else persistLocal();
+}
+function newId(){ return 't' + now().toString(36) + Math.random().toString(36).slice(2, 7); }
+
+function startLocal(){
+  mode = 'local';
+  let arr = null;
+  try { arr = JSON.parse(localStorage.getItem(LS_KEY) || 'null'); } catch {}
+  tasks = new Map((Array.isArray(arr) ? arr : []).map(t => [t.id, t]));
+  render();
+}
+
+/* served by server.js: tasks live in data/tasks.json on this machine */
+async function tryFile(){
+  if (!/^https?:$/.test(location.protocol)) return false;
+  try {
+    const r = await fetch('api/tasks', {cache:'no-store'});
+    if (!r.ok) return false;
+    const arr = await r.json();
+    if (!Array.isArray(arr)) return false;
+    mode = 'file';
+    tasks = new Map(arr.map(t => [t.id, t]));
+    render();
+    return true;
+  } catch { return false; }
+}
+
+async function init(){
+  render();
+  const inArtifact = !!(window.claude && typeof window.claude.use === 'function');
+  if (!inArtifact){
+    if (await tryFile()) return;
+    return startLocal();
+  }
+  let db = null;
+  try { db = await window.claude.use('db'); } catch { db = null; }
+  if (!db) return startLocal();
+  mode = 'shared';
+  col = db.collection('tasks');
+  col.onSnapshot(snap => {
+    const next = new Map();
+    snap.docs.forEach(d => next.set(d.id, {id:d.id, ...d.data()}));
+    tasks = next;
+    render();
+  }, () => {
+    document.getElementById('sync').textContent = 'การเชื่อมต่อข้อมูลหลุด — รีเฟรชหน้าเพื่อโหลดใหม่';
+  });
+}
+
+/* ---------- actions ---------- */
+function startTimer(id){
+  // only one clock runs at a time
+  for (const t of tasks.values()){
+    if (t.id !== id && t.runningSince) save({...t, spentMs: spent(t), runningSince:null});
+  }
+  const t = tasks.get(id);
+  if (!t) return;
+  save({...t, status:'doing', runningSince: t.runningSince || now()});
+}
+function pauseTimer(id){
+  const t = tasks.get(id);
+  if (t?.runningSince) save({...t, spentMs: spent(t), runningSince:null});
+}
+function moveTo(id, target){
+  const t = tasks.get(id);
+  if (!t) return;
+  if (target === 'doing'){ startTimer(id); return; }
+  const base = {...t, spentMs: spent(t), runningSince:null};
+  if (target === 'done'){
+    save({...base, status:'done', doneAt: now()});
+    const over = base.spentMs - estMs(base);
+    toast(over > 0 ? `เสร็จแล้ว — เกินเวลา ${fmt(over)}` : `เสร็จแล้ว — เร็วกว่าที่ตั้งไว้ ${fmt(-over)}`);
+    return;
+  }
+  // back to a quadrant
+  save({...base, status:'board', quadrant: target, doneAt:null});
+}
+
+/* ---------- render ---------- */
+function byOrder(a, b){ return (a.createdAt || 0) - (b.createdAt || 0); }
+
+function render(){
+  const all = [...tasks.values()];
+  const matrix = document.getElementById('matrix');
+  matrix.innerHTML = QUADS.map(q => {
+    const items = all.filter(t => t.status === 'board' && t.quadrant === q.id).sort(byOrder);
+    return `<div class="quad" data-q="${q.id}" data-drop="${q.id}">
+      <div class="qhead"><span class="qdot"></span><h2>${q.name}</h2><small>${q.hint}</small><span class="qcount">${items.length}</span></div>
+      <div class="list">${items.map(cardHTML).join('') || (mode === 'loading' ? '<div class="empty">กำลังโหลด…</div>' : '<div class="empty">ยังไม่มีงานในช่องนี้</div>')}</div>
+      <button class="qadd" data-add="${q.id}">+ เพิ่มงาน${q.name}</button>
+    </div>`;
+  }).join('');
+
+  const doing = all.filter(t => t.status === 'doing').sort((a, b) => (b.runningSince ? 1 : 0) - (a.runningSince ? 1 : 0) || byOrder(a, b));
+  document.getElementById('doing').innerHTML = doing.length
+    ? doing.map(jobHTML).join('')
+    : '<div class="dz-empty">ลากการ์ดจากบอร์ดมาวางที่นี่<br>หรือกด “หยิบไปทำ” บนการ์ด<br>เวลาจะเริ่มเดินทันที</div>';
+  document.getElementById('doing-sub').textContent = doing.length ? `${doing.length} งาน` : 'ลากการ์ดมาวางตรงนี้';
+
+  const done = all.filter(t => t.status === 'done').sort((a, b) => (b.doneAt || 0) - (a.doneAt || 0));
+  document.getElementById('done').innerHTML = done.length
+    ? `<div class="done-list">${done.map(doneHTML).join('')}</div>`
+    : '<div class="dz-empty" style="padding:8px">ยังไม่มีงานที่เสร็จ</div>';
+  const onTime = done.filter(t => (t.spentMs || 0) <= estMs(t)).length;
+  document.getElementById('done-sub').textContent = done.length ? `ทันเวลา ${onTime}/${done.length}` : '';
+  document.getElementById('done-foot').innerHTML = done.length
+    ? `<span>ตั้งไว้รวม ${fmt(done.reduce((s, t) => s + estMs(t), 0))} · ใช้จริง ${fmt(done.reduce((s, t) => s + (t.spentMs || 0), 0))}</span><button class="btn quiet" data-clear>${armed === 'clear' ? 'กดอีกครั้งเพื่อยืนยัน' : 'ล้างรายการ'}</button>`
+    : '';
+
+  renderStats(all);
+  document.getElementById('sync').textContent =
+    mode === 'shared' ? 'บันทึกอัตโนมัติ · เปิดจากเครื่องไหนก็เห็นบอร์ดเดียวกัน'
+    : mode === 'file' ? 'บันทึกลงไฟล์ data/tasks.json ในเครื่องนี้'
+    : mode === 'local' ? 'บันทึกไว้ในเบราว์เซอร์นี้' : '';
+  tick();
+}
+
+function renderStats(all){
+  const open = all.filter(t => t.status !== 'done');
+  const load = open.reduce((s, t) => s + Math.max(0, estMs(t) - spent(t)), 0);
+  const overCount = open.filter(t => estMs(t) && spent(t) > estMs(t)).length;
+  document.getElementById('stats').innerHTML = `
+    <div class="stat"><b>${open.length}</b><span>งานค้าง</span></div>
+    <div class="stat"><b>${fmt(load)}</b><span>เวลาที่ยังต้องใช้</span></div>
+    <div class="stat"><b style="color:${overCount ? 'var(--over)' : 'inherit'}">${overCount}</b><span>งานเกินเวลา</span></div>`;
+}
+
+function cardHTML(t){
+  const s = spent(t), e = estMs(t), over = e && s > e;
+  const pct = e ? Math.min(100, s / e * 100) : 0;
+  return `<article class="card" draggable="true" data-id="${t.id}" data-q="${t.quadrant}" tabindex="0" aria-label="${esc(t.title)}">
+    <div class="t">${esc(t.title)}</div>
+    ${t.note ? `<div class="n">${esc(t.note)}</div>` : ''}
+    ${s > 0 ? `<div class="minibar ${over ? 'over' : ''}" style="--q:var(--q-${t.quadrant})"><i style="width:${pct}%"></i></div>` : ''}
+    <div class="meta">
+      <span class="chip">${fmtMin(t.estMin || 0)}</span>
+      ${s > 0 ? `<span class="chip ${over ? 'over' : ''}">ใช้ไป ${fmt(s)}</span>` : ''}
+      <button class="go" data-go="${t.id}">หยิบไปทำ →</button>
+    </div>
+  </article>`;
+}
+
+function jobHTML(t){
+  const running = !!t.runningSince;
+  return `<article class="job ${running ? 'running' : 'paused'}" draggable="true" data-id="${t.id}" data-q="${t.quadrant}" data-timer="${t.id}">
+    <div class="top1"><div class="t">${esc(t.title)}</div><span class="tag">${QNAME[t.quadrant] || ''}</span></div>
+    <div class="clock" data-clock>${fmt(spent(t))}</div>
+    <div class="bar"><i data-fill></i><span class="mark" data-mark hidden></span></div>
+    <div class="state" data-state></div>
+    <div class="acts">
+      ${running
+        ? `<button class="btn" data-pause="${t.id}">พักเวลา</button>`
+        : `<button class="btn primary" data-start="${t.id}">${spent(t) > 0 ? 'ทำต่อ' : 'เริ่มจับเวลา'}</button>`}
+      <button class="btn good" data-finish="${t.id}">เสร็จแล้ว</button>
+      <button class="btn quiet" data-back="${t.id}">คืนบอร์ด</button>
+    </div>
+  </article>`;
+}
+
+function doneHTML(t){
+  const s = t.spentMs || 0, e = estMs(t), diff = s - e;
+  return `<div class="drow">
+    <div class="t">${esc(t.title)}</div>
+    <div class="r">${fmt(s)} / ${fmt(e)}</div>
+    <button class="undo" data-reopen="${t.id}">นำกลับมาทำ</button>
+    <div class="d ${diff > 0 ? 'over' : 'ok'}">${diff > 0 ? '+' + fmt(diff) + ' เกิน' : '−' + fmt(-diff) + ' ทัน'}</div>
+  </div>`;
+}
+
+/* live clock: updates timer text only, never re-renders the board */
+function tick(){
+  let runningTitle = null;
+  document.querySelectorAll('[data-timer]').forEach(el => {
+    const t = tasks.get(el.dataset.timer);
+    if (!t) return;
+    const s = spent(t), e = estMs(t), ratio = e ? s / e : 0;
+    const over = e && s > e, warn = !over && ratio >= 0.8;
+    el.classList.toggle('over', !!over);
+    el.classList.toggle('warn', warn);
+    el.querySelector('[data-clock]').textContent = fmt(s);
+    const fill = el.querySelector('[data-fill]'), mark = el.querySelector('[data-mark]');
+    if (over){
+      // scale so the estimate sits at its true position inside the overrun
+      fill.style.width = '100%';
+      mark.hidden = false;
+      mark.style.left = `calc(${(e / s * 100).toFixed(2)}% - 1px)`;
+    } else {
+      fill.style.width = Math.min(100, ratio * 100).toFixed(2) + '%';
+      mark.hidden = true;
+    }
+    el.querySelector('[data-state]').innerHTML = over
+      ? `เกินเวลาแล้ว <b>+${fmt(s - e)}</b> · ตั้งไว้ ${fmtMin(t.estMin)}`
+      : `เหลือ <b>${fmt(e - s)}</b> จาก ${fmtMin(t.estMin)}${t.runningSince ? '' : ' · หยุดพักอยู่'}`;
+    if (t.runningSince){
+      runningTitle = `${over ? '⚠ +' + fmt(s - e) : fmt(s)} · ${t.title}`;
+      if (over && !overNotified.has(t.id)){
+        overNotified.add(t.id);
+        toast(`“${t.title}” เกินเวลาที่ตั้งไว้แล้ว`, true);
+      }
+      if (!over) overNotified.delete(t.id);
+    }
+  });
+  document.title = runningTitle || 'บอร์ดโฟกัส';
+}
+setInterval(tick, 1000);
+setInterval(() => renderStats([...tasks.values()]), 15000);
+
+/* ---------- toast ---------- */
+let toastTimer;
+function toast(msg, alert){
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.toggle('alert', !!alert);
+  el.hidden = false;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { el.hidden = true; }, alert ? 5000 : 3000);
+}
+
+/* ---------- dialog ---------- */
+const dlg = document.getElementById('dlg');
+const form = document.getElementById('form');
+const fTitle = document.getElementById('f-title');
+let editingId = null;
+document.getElementById('f-quad').innerHTML = QUADS.map(q =>
+  `<label for="fq-${q.id}"><input type="radio" id="fq-${q.id}" name="quad" value="${q.id}">${q.name}</label>`).join('');
+document.getElementById('quick').innerHTML = [15, 25, 30, 45, 60, 90, 120].map(m => `<button type="button" data-min="${m}">${m}</button>`).join('');
+
+function openDialog(id, quad){
+  editingId = id;
+  const t = id ? tasks.get(id) : null;
+  document.getElementById('dlg-title').textContent = t ? 'แก้ไขงาน' : 'เพิ่มงาน';
+  fTitle.value = t?.title || '';
+  form.note.value = t?.note || '';
+  form.est.value = t?.estMin || 30;
+  const q = t?.quadrant || quad || 'need';
+  document.getElementById('fq-' + q).checked = true;
+  const del = document.getElementById('f-del');
+  del.hidden = !t; del.textContent = 'ลบงาน'; armed = null;
+  dlg.showModal();
+  fTitle.focus();
+}
+form.addEventListener('submit', e => {
+  const title = fTitle.value.trim();
+  const est = Math.round(Number(form.est.value));
+  if (!title || !(est > 0)) { e.preventDefault(); return; }
+  const quadrant = form.quad.value || 'need';
+  const base = editingId ? tasks.get(editingId) : {id:newId(), spentMs:0, runningSince:null, status:'board', createdAt:now(), doneAt:null};
+  save({...base, title, note: form.note.value.trim(), estMin: est, quadrant});
+});
+document.getElementById('f-cancel').onclick = () => dlg.close();
+/* two-step confirm: window.confirm() is blocked inside the artifact sandbox */
+let armed = null, armTimer;
+function confirmTwice(key, btn, prompt, idle){
+  if (armed === key){ armed = null; clearTimeout(armTimer); btn.textContent = idle; return true; }
+  armed = key;
+  btn.textContent = prompt;
+  clearTimeout(armTimer);
+  armTimer = setTimeout(() => {
+    armed = null; btn.textContent = idle;
+    const c = document.querySelector('[data-clear]'); if (c) c.textContent = 'ล้างรายการ';
+  }, 3000);
+  return false;
+}
+document.getElementById('f-del').onclick = e => {
+  if (editingId && confirmTwice('del:' + editingId, e.currentTarget, 'กดอีกครั้งเพื่อยืนยันลบ', 'ลบงาน')) { remove(editingId); dlg.close(); }
+};
+document.getElementById('quick').addEventListener('click', e => {
+  const m = e.target.dataset.min; if (m) form.est.value = m;
+});
+
+/* ---------- clicks ---------- */
+document.addEventListener('click', e => {
+  const b = e.target.closest('button, .card');
+  if (!b) return;
+  const d = b.dataset;
+  if (d.add) return openDialog(null, d.add);
+  if (d.go) return moveTo(d.go, 'doing');
+  if (d.start) return startTimer(d.start);
+  if (d.pause) return pauseTimer(d.pause);
+  if (d.finish) return moveTo(d.finish, 'done');
+  if (d.back) { const t = tasks.get(d.back); return moveTo(d.back, t.quadrant); }
+  if (d.reopen) { const t = tasks.get(d.reopen); return save({...t, status:'board', doneAt:null}); }
+  if ('clear' in d) {
+    if (confirmTwice('clear', b, 'กดอีกครั้งเพื่อยืนยัน', 'ล้างรายการ')) [...tasks.values()].filter(t => t.status === 'done').forEach(t => remove(t.id));
+    return;
+  }
+  if (b.classList.contains('card')) openDialog(d.id);
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && e.target.classList?.contains('card')) openDialog(e.target.dataset.id);
+});
+
+/* ---------- drag & drop ---------- */
+let dragId = null;
+document.addEventListener('dragstart', e => {
+  const el = e.target.closest?.('[draggable][data-id]');
+  if (!el) return;
+  dragId = el.dataset.id;
+  el.classList.add('dragging');
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', dragId);
+});
+document.addEventListener('dragend', () => {
+  dragId = null;
+  document.querySelectorAll('.dragging,.drop-hot').forEach(x => x.classList.remove('dragging', 'drop-hot'));
+});
+document.addEventListener('dragover', e => {
+  const z = e.target.closest?.('[data-drop]');
+  if (!z || !dragId) return;
+  e.preventDefault();
+  document.querySelectorAll('.drop-hot').forEach(x => x !== z && x.classList.remove('drop-hot'));
+  z.classList.add('drop-hot');
+});
+document.addEventListener('drop', e => {
+  const z = e.target.closest?.('[data-drop]');
+  if (!z || !dragId) return;
+  e.preventDefault();
+  const id = dragId, target = z.dataset.drop, t = tasks.get(id);
+  z.classList.remove('drop-hot');
+  if (!t) return;
+  if (target === 'doing' && t.status === 'doing') return;
+  if (target === t.quadrant && t.status === 'board') return;
+  moveTo(id, target);
+});
+
+init();
+</script>

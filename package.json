@@ -1,0 +1,9 @@
+{
+  "name": "focus-board",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Four-box task board with a time tracker that compares time spent against each card's estimate",
+  "scripts": {
+    "start": "node server.js"
+  }
+}

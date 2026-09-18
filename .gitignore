@@ -1,0 +1,5 @@
+# personal task data — never commit
+data/
+*.tmp
+.DS_Store
+node_modules/
