@@ -2,6 +2,8 @@
 
 A task board with four boxes: จำเป็น (necessary), สำคัญ (important), เร่งด่วน (urgent), and ไม่เร่งด่วน (not urgent). Drag a card into **กำลังทำ** (doing) to start its timer. The timer shows time spent against the card's estimate and warns you once you pass it.
 
+![บอร์ดโฟกัส in dark mode, showing the four task boxes, the doing panel, and the done panel](docs/screenshot.png)
+
 ## Run locally
 
 ```bash
